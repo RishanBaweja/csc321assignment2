@@ -39,14 +39,14 @@ def file_parser(input_file):
                 if len(data) != 16:
                     break
 
-                encrypted = ECB_encryption(data)
+                encrypted = CBC_encryption(data)
 
                 o.write(encrypted)
                 
             pad = 16 - (len(data) % 16)
             data += bytes([pad]) * pad
 
-            encrypted = ECB_encryption(data)
+            encrypted = CBC_encryption(data)
             o.write(encrypted)
         
 
