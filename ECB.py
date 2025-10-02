@@ -4,12 +4,12 @@ import struct
 def ECB_encryption(data):
     # Using 16-byte / 128 encryption key
     key = b'Sixteen byte key'
+    
     # Cipher used with code in instructions
     cipher = AES.new(key, AES.MODE_ECB)
 
     #encrypt the data and then return it
     encrypted_data = cipher.encrypt(data)
-
 
     return encrypted_data
 
