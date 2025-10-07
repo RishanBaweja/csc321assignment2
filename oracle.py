@@ -28,12 +28,6 @@ def verify(input : bytes) -> bool:
     return False
 
 def encrypt(data, cross):
-    # Using 16-byte / 128 encryption key / iv
-    key = b'Sixteen byte key'
-    
-    # Cipher used with code in instructions
-    cipher = AES.new(key, AES.MODE_ECB)
-
     # XOR data with random bits before going through the cipher
     new_data = bytes(map(xor, data, cross))
 
@@ -41,7 +35,10 @@ def encrypt(data, cross):
     encrypted_data = cipher.encrypt(new_data)
     return encrypted_data
 
-
+# Using 16-byte / 128 encryption key / iv
+key = b'Sixteen byte key'
+# Cipher used with code in instructions
+cipher = AES.new(key, AES.MODE_ECB)
 # iv = urandom(16)
 iv = b'\xea\xbd\xf5\xe2}2\xafH\xf4\xediy\xdd\xc5\xe6\xeb'
 new_data = submit("Hey does :admin=true?")
