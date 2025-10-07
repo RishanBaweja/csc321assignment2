@@ -1,4 +1,5 @@
 
+from Crypto.Util.Padding import unpad
 from Crypto.Cipher import AES
 from os import urandom
 from operator import xor
@@ -12,7 +13,8 @@ key = b'Sixteen byte key'
 iv = b'\xea\xbd\xf5\xe2}2\xafH\xf4\xediy\xdd\xc5\xe6\xeb'
 
 def submit(input : str) -> bytes:
-    url_encoded = urllib.parse.quote(input, safe='')
+    mod = "userid=456; userdata=" + input + ";session-id=31337"
+    url_encoded = mod.replace(";", "%3B").replace("=", "3D")
     # print(url_encoded)
 
     padded = CBC.pkcs7_padding(url_encoded.encode("utf-8"), 16)
@@ -22,16 +24,20 @@ def submit(input : str) -> bytes:
     encrypted = b''
     while len(prev) != 0:
         encrypted += CBC.CBC_encryption(padded[:16], prev)
-        print(padded)
+        print(encrypted)
         padded = padded[:16]
         prev = encrypted[16:]
     return encrypted
 
-def verify(input : bytes) -> str:
-    prev = bytes(iv)
+def verify(input : bytes) -> bool:
+    decrypted = b''
+
+    return False
 
 # Cipher used with code in instructions
 cipher = AES.new(key, AES.MODE_ECB)
 
 new_data = submit("Hey does :admin=true?")
 print(new_data)
+
+print(verify(new_data))
