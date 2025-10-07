@@ -16,6 +16,8 @@ def CBC_encryption(data, cross):
     # Encrypt the data and then return it
     encrypted_data = cipher.encrypt(new_data)
 
+    # Not recommended to update value of cross in function as it only applies locally
+
     return encrypted_data
 
 def pkcs7_padding(plain, size):
