@@ -18,6 +18,16 @@ def CBC_encryption(data):
 
     return encrypted_data
 
+def pkcs7_padding(plain, size):
+    byte_len = size - (len(plain) % size)
+    if byte_len == 0:
+        byte_len = size
+    plain += bytes([byte_len]) * byte_len
+    return plain
+
+def pkcs7_strip(padded, size):
+    return padded[:-padded[-1]]
+
 def file_parser(input_file):
 
     with open(input_file, "rb") as i:
@@ -50,5 +60,14 @@ def file_parser(input_file):
             o.write(encrypted)
         
 
-file_parser("mustang.bmp")
-file_parser("cp-logo.bmp")
+# file_parser("mustang.bmp")
+# file_parser("cp-logo.bmp")
+
+# pkcs7 testing
+print("\nPKCS7 padding implementation:\n")
+Unpadded = b"Something"
+Test_len = 16
+Padded = pkcs7_padding(Unpadded, Test_len)
+print(Padded)
+Undone = pkcs7_strip(Padded, Test_len)
+print(Undone)
