@@ -19,6 +19,13 @@ def submit(input : str) -> bytes:
     # print(padded)
     
     prev = bytes(iv)
+    encrypted = b''
+    while len(prev) != 0:
+        encrypted += CBC.CBC_encryption(padded[:16], prev)
+        print(padded)
+        padded = padded[:16]
+        prev = encrypted[16:]
+    return encrypted
 
 def verify(input : bytes) -> str:
     prev = bytes(iv)
@@ -26,5 +33,5 @@ def verify(input : bytes) -> str:
 # Cipher used with code in instructions
 cipher = AES.new(key, AES.MODE_ECB)
 
-new_string = submit("Hey does :admin=true?")
-print(new_string)
+new_data = submit("Hey does :admin=true?")
+print(new_data)
