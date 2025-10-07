@@ -2,7 +2,7 @@ from Crypto.Cipher import AES
 from os import urandom
 from operator import xor
 
-def CBC_encryption(data, cross):
+def CBC_encryption(data : bytes, cross : bytes) -> bytes:
     # Using 16-byte / 128 encryption key
     key = b'Sixteen byte key'
     # randbits = urandom(16)
@@ -20,17 +20,17 @@ def CBC_encryption(data, cross):
 
     return encrypted_data
 
-def pkcs7_padding(plain, size):
+def pkcs7_padding(plain : bytes, size : int) -> bytes:
     byte_len = size - (len(plain) % size)
     if byte_len == 0:
         byte_len = size
     plain += bytes([byte_len]) * byte_len
     return plain
 
-def pkcs7_strip(padded, size):
+def pkcs7_strip(padded : bytes, size : int):
     return padded[:-padded[-1]]
 
-def file_parser(input_file):
+def file_parser(input_file : str) -> None:
 
     with open(input_file, "rb") as i:
 
