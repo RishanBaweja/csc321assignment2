@@ -24,7 +24,8 @@ def submit(input : str) -> bytes:
     return encrypted
 
 def verify(input : bytes) -> bool:
-
+    plaintext = unpad(cipher.decrypt(input), 16).decode('utf-8')
+    print(plaintext)
     return False
 
 def encrypt(data, cross):
@@ -44,5 +45,7 @@ iv = b'\xea\xbd\xf5\xe2}2\xafH\xf4\xediy\xdd\xc5\xe6\xeb'
 new_data = submit("Hey does :admin=true?")
 
 print(new_data)
+
+verify(new_data)
 
 
