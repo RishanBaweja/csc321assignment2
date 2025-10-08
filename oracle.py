@@ -9,14 +9,13 @@ import CBC
 
 
 def submit(input : str) -> bytes:
+    #Tagging with prefix and suffix
+    mod = "userid=456; userdata=" + input + ";session-id=31337"
 
     #URL Encoding
-    url_encoded = input.replace(";", "%3B").replace("=", "%3D")
+    url_encoded = mod.replace(";", "%3B").replace("=", "%3D")
 
-    #Tagging with prefix and suffix
-    mod = "userid=456; userdata=" + url_encoded + ";session-id=31337"
-
-    padded = CBC.pkcs7_padding(mod.encode("utf-8"), 16)
+    padded = CBC.pkcs7_padding(url_encoded.encode("utf-8"), 16)
 
     # Typically use iv = urandom(16), but instructions said to used fixed iv
     iv = b'\xea\xbd\xf5\xe2}2\xafH\xf4\xediy\xdd\xc5\xe6\xeb'
@@ -36,9 +35,9 @@ def verify(input: bytes) -> bool:
         prev = input[i:i+16]
         # print(decrypted)
 
+    # print(decrypted)
     unpadded = CBC.pkcs7_strip(decrypted, 16)
     plaintext = unpadded.decode("utf-8")
-    print(plaintext)
     print(plaintext)
     return ";admin=true;" in plaintext
 
@@ -65,11 +64,18 @@ iv = b'\xea\xbd\xf5\xe2}2\xafH\xf4\xediy\xdd\xc5\xe6\xeb'
 
 new_data = submit("Hey does :admin)true?")
 
-#use xor to tamper
+# use xor to tamper
 print(new_data)
 
 xor_block = b'\x00' * 16
 modified_block = bytes(a ^ b for a, b in zip(new_data[:16], xor_block))
 modified_data = modified_block + new_data[16:]
 
+# b'userid%3D456%3B userdata%3DHey does :admin)true?%3Bsession-id%3D31337\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b'
+# userid%3D456%3B 
+# userdata%3DHey d
+# oes :admin)true?
+# %3Bsession-id%3D
+# 31337\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b
+# There are five blocks in data without changes
 print(verify(modified_data))
