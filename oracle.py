@@ -28,14 +28,14 @@ def submit(input : str) -> bytes:
     return encrypted
 
 def verify(input: bytes) -> bool:
-    prev = iv
+    prev = bytes(iv)
     decrypted = b''
     for i in range(0, len(input), 16):
         decrypted += decrypt(input[i:i+16], prev)
         prev = input[i:i+16]
         # print(decrypted)
 
-    # print(decrypted)
+    print(decrypted)
     unpadded = CBC.pkcs7_strip(decrypted, 16)
     plaintext = unpadded.decode("utf-8")
     print(plaintext)
@@ -68,8 +68,10 @@ new_data = submit("Hey does :admin)true?")
 print(new_data)
 
 xor_block = b'\x00' * 16
-modified_block = bytes(a ^ b for a, b in zip(new_data[:16], xor_block))
-modified_data = modified_block + new_data[16:]
+modified_data = b''
+for i in range(0, len(new_data), 16):
+    modified_block = bytes(a ^ b for a, b in zip(new_data[i:i+16], xor_block))
+    modified_data += modified_block
 
 # b'userid%3D456%3B userdata%3DHey does :admin)true?%3Bsession-id%3D31337\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b'
 # userid%3D456%3B 
