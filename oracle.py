@@ -38,6 +38,7 @@ def verify(input: bytes) -> bool:
 
     unpadded = CBC.pkcs7_strip(decrypted, 16)
     plaintext = unpadded.decode("utf-8")
+    print(plaintext)
     return ";admin=true;" in plaintext
 
 def encrypt(data, cross):
@@ -61,9 +62,13 @@ cipher = AES.new(key, AES.MODE_ECB)
 # iv = urandom(16)
 iv = b'\xea\xbd\xf5\xe2}2\xafH\xf4\xediy\xdd\xc5\xe6\xeb'
 
-new_data = submit("Hey does :admin=true?")
+new_data = submit("Hey does :admin)true?")
 
 #use xor to tamper
 print(new_data)
 
-print(verify(new_data))
+xor_block = b'\x00' * 16
+modified_block = bytes(a ^ b for a, b in zip(new_data[:16], xor_block))
+modified_data = modified_block + new_data[16:]
+
+print(verify(modified_data))
