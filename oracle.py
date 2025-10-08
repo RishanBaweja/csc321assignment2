@@ -18,17 +18,23 @@ def submit(input : str) -> bytes:
     
     prev = bytes(iv)
     encrypted = b''
-    while len(prev) != 0:
+    for i in range(0, len(padded), 16):
         encrypted += encrypt(padded[:16], prev)
-        padded = padded[:16]
-        prev = encrypted[16:]
+        padded = padded[16:]
+        prev = encrypted[i:]
     return encrypted
 
 def verify(input: bytes) -> bool:
-    new_cipher = AES.new(key, AES.MODE_CBC, iv)
-    plaintext = unpad(new_cipher.decrypt(input), AES.block_size)
-    
-    return b";admin=true;" in plaintext
+    prev = bytes(iv)
+    decrypted = b''
+    for i in range(0, len(input), 16):
+        decrypted += decrypt(input[i:i+16], prev)
+        prev = input[i:i+16]
+        # print(decrypted)
+
+    unpadded = CBC.pkcs7_strip(decrypted, 16)
+    plaintext = unpadded.decode("utf-8")
+    return ";admin=true;" in plaintext
 
 def encrypt(data, cross):
     # XOR data with random bits before going through the cipher
@@ -37,6 +43,12 @@ def encrypt(data, cross):
     # Encrypt the data and then return it
     encrypted_data = cipher.encrypt(new_data)
     return encrypted_data
+
+def decrypt(data, cross):
+    decrypted_data = cipher.decrypt(data)
+
+    new_data = bytes(map(xor, decrypted_data, cross))
+    return new_data
 
 # Using 16-byte / 128 encryption key / iv
 key = b'Sixteen byte key'
@@ -48,6 +60,4 @@ new_data = submit("Hey does :admin=true?")
 
 print(new_data)
 
-verify(new_data)
-
-
+print(verify(new_data))
