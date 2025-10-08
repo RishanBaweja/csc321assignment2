@@ -9,13 +9,17 @@ import CBC
 
 
 def submit(input : str) -> bytes:
+
+    #URL Encoding
     url_encoded = input.replace(";", "%3B").replace("=", "3D")
+
+    #Tagging with prefix and suffix
     mod = "userid=456; userdata=" + url_encoded + ";session-id=31337"
-    # print(url_encoded)
 
     padded = CBC.pkcs7_padding(mod.encode("utf-8"), 16)
-    # print(padded)
-    
+
+    # Typically use iv = urandom(16), but instructions said to used fixed iv
+    iv = b'\xea\xbd\xf5\xe2}2\xafH\xf4\xediy\xdd\xc5\xe6\xeb'
     prev = bytes(iv)
     encrypted = b''
     for i in range(0, len(padded), 16):
@@ -52,12 +56,11 @@ def decrypt(data, cross):
 
 # Using 16-byte / 128 encryption key / iv
 key = b'Sixteen byte key'
-# Cipher used with code in instructions
-cipher = AES.new(key, AES.MODE_ECB)
-# iv = urandom(16)
 iv = b'\xea\xbd\xf5\xe2}2\xafH\xf4\xediy\xdd\xc5\xe6\xeb'
+
 new_data = submit("Hey does :admin=true?")
 
+#use xor to tamper
 print(new_data)
 
 print(verify(new_data))
