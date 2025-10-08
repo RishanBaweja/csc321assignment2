@@ -7,12 +7,13 @@ import urllib.parse
 
 import CBC
 
+
 def submit(input : str) -> bytes:
-    mod = "userid=456; userdata=" + input + ";session-id=31337"
-    url_encoded = mod.replace(";", "%3B").replace("=", "3D")
+    url_encoded = input.replace(";", "%3B").replace("=", "3D")
+    mod = "userid=456; userdata=" + url_encoded + ";session-id=31337"
     # print(url_encoded)
 
-    padded = CBC.pkcs7_padding(url_encoded.encode("utf-8"), 16)
+    padded = CBC.pkcs7_padding(mod.encode("utf-8"), 16)
     # print(padded)
     
     prev = bytes(iv)
@@ -23,10 +24,11 @@ def submit(input : str) -> bytes:
         prev = encrypted[16:]
     return encrypted
 
-def verify(input : bytes) -> bool:
-    plaintext = unpad(cipher.decrypt(input), 16).decode('utf-8')
-    print(plaintext)
-    return False
+def verify(input: bytes) -> bool:
+    new_cipher = AES.new(key, AES.MODE_CBC, iv)
+    plaintext = unpad(new_cipher.decrypt(input), AES.block_size)
+    
+    return b";admin=true;" in plaintext
 
 def encrypt(data, cross):
     # XOR data with random bits before going through the cipher
