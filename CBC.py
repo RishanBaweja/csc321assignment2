@@ -2,10 +2,7 @@ from Crypto.Cipher import AES
 from os import urandom
 from operator import xor
 
-def CBC_encryption(data : bytes, cross : bytes) -> bytes:
-    # Using 16-byte / 128 encryption key
-    key = b'Sixteen byte key'
-    # randbits = urandom(16)
+def CBC_encryption(data : bytes, key, cross : bytes) -> bytes:
 
     # XOR data with random bits before going through the cipher
     new_data = bytes(map(xor, data, cross))
@@ -43,6 +40,9 @@ def file_parser(input_file : str) -> None:
         #iv created
         prev = urandom(16)
 
+        # Using 16-byte / 128 encryption key
+        key = b'Sixteen byte key'
+
         output_file = "CBC_" +input_file
         # open output file as o and write the header
         with open(output_file, "wb") as o:
@@ -54,7 +54,7 @@ def file_parser(input_file : str) -> None:
                 if len(data) != 16:
                     break
 
-                encrypted = CBC_encryption(data, prev)
+                encrypted = CBC_encryption(data, key, prev)
 
                 # update value of prev, initially from iv then to subsequent encrypted blocks
                 prev = encrypted
@@ -64,7 +64,7 @@ def file_parser(input_file : str) -> None:
             pad = 16 - (len(data) % 16)
             data += bytes([pad]) * pad
 
-            encrypted = CBC_encryption(data, prev)
+            encrypted = CBC_encryption(data, key, prev)
             o.write(encrypted)
         
 

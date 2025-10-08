@@ -9,19 +9,26 @@ import CBC
 
 
 def submit(input : str) -> bytes:
+
+    #URL Encoding
     url_encoded = input.replace(";", "%3B").replace("=", "3D")
+
+    #Tagging with prefix and suffix
     mod = "userid=456; userdata=" + url_encoded + ";session-id=31337"
-    # print(url_encoded)
 
     padded = CBC.pkcs7_padding(mod.encode("utf-8"), 16)
-    # print(padded)
-    
+
+    # Typically use iv = urandom(16), but instructions said to used fixed iv
+    iv = b'\xea\xbd\xf5\xe2}2\xafH\xf4\xediy\xdd\xc5\xe6\xeb'
     prev = bytes(iv)
     encrypted = b''
+
     while len(prev) != 0:
-        encrypted += encrypt(padded[:16], prev)
-        padded = padded[:16]
-        prev = encrypted[16:]
+        ct = CBC.CBC_encryption(padded[:16], key, prev)
+        encrypted += ct
+        prev = ct
+        padded = padded[16:]
+
     return encrypted
 
 def verify(input: bytes) -> bool:
@@ -30,24 +37,17 @@ def verify(input: bytes) -> bool:
     
     return b";admin=true;" in plaintext
 
-def encrypt(data, cross):
-    # XOR data with random bits before going through the cipher
-    new_data = bytes(map(xor, data, cross))
-
-    # Encrypt the data and then return it
-    encrypted_data = cipher.encrypt(new_data)
-    return encrypted_data
-
-# Using 16-byte / 128 encryption key / iv
+#Global variables
+# Using 16-byte / 128 encryption key
 key = b'Sixteen byte key'
-# Cipher used with code in instructions
-cipher = AES.new(key, AES.MODE_ECB)
-# iv = urandom(16)
 iv = b'\xea\xbd\xf5\xe2}2\xafH\xf4\xediy\xdd\xc5\xe6\xeb'
+
 new_data = submit("Hey does :admin=true?")
 
+#use xor to tamper
 print(new_data)
 
-verify(new_data)
+print(verify(new_data))
+
 
 
