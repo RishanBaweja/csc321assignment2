@@ -11,7 +11,7 @@ import CBC
 def submit(input : str) -> bytes:
 
     #URL Encoding
-    url_encoded = input.replace(";", "%3B").replace("=", "3D")
+    url_encoded = input.replace(";", "%3B").replace("=", "%3D")
 
     #Tagging with prefix and suffix
     mod = "userid=456; userdata=" + url_encoded + ";session-id=31337"
@@ -29,7 +29,7 @@ def submit(input : str) -> bytes:
     return encrypted
 
 def verify(input: bytes) -> bool:
-    prev = bytes(iv)
+    prev = iv
     decrypted = b''
     for i in range(0, len(input), 16):
         decrypted += decrypt(input[i:i+16], prev)
@@ -38,6 +38,7 @@ def verify(input: bytes) -> bool:
 
     unpadded = CBC.pkcs7_strip(decrypted, 16)
     plaintext = unpadded.decode("utf-8")
+    print(plaintext)
     return ";admin=true;" in plaintext
 
 def encrypt(data, cross):
@@ -61,7 +62,7 @@ cipher = AES.new(key, AES.MODE_ECB)
 # iv = urandom(16)
 iv = b'\xea\xbd\xf5\xe2}2\xafH\xf4\xediy\xdd\xc5\xe6\xeb'
 
-new_data = submit("Hey does :admin=true?")
+new_data = submit("Hey does :admin=true;")
 
 #use xor to tamper
 print(new_data)

@@ -2,7 +2,7 @@ from Crypto.Cipher import AES
 from os import urandom
 from operator import xor
 
-def CBC_encryption(data : bytes, key, cross : bytes) -> bytes:
+def CBC_encryption(data : bytes, key: bytes, cross : bytes) -> bytes:
 
     # XOR data with random bits before going through the cipher
     new_data = bytes(map(xor, data, cross))
