@@ -29,23 +29,20 @@ def submit(input : str) -> bytes:
         
     return encrypted
 
-def verify(input: bytes) -> bool:
-    try:
-        prev = bytes(iv)
-        decrypted = b''
-        for i in range(0, len(input), 16):
-            block = decrypt(input[i:i+16], prev)
-            print(f"DECRYPTED Block {i/16}: {block}\n")
-            decrypted += block
-            prev = input[i:i+16]
 
-        #print(decrypted)
-        unpadded = CBC.pkcs7_strip(decrypted, 16)
-        plaintext = unpadded.decode("utf-8")
-        print(f"Plaintext: {plaintext}")
-    except:
-        print("whoops")
-        return ";admin=true;" in plaintext
+def verify(input: bytes) -> bool:
+
+    prev = bytes(iv)
+    decrypted = b''
+    for i in range(0, len(input), 16):
+        block = decrypt(input[i:i+16], prev)
+        print(f"DECRYPTED Block {i/16}: {block}\n")
+        decrypted += block
+        prev = input[i:i+16]
+
+    unpadded = CBC.pkcs7_strip(decrypted, 16)
+    plaintext = unpadded.decode("utf-8",  errors='replace')
+    return ";admin=true;" in plaintext
 
 def encrypt(data, cross):
     # XOR data with random bits before going through the cipher
@@ -73,14 +70,16 @@ new_data = submit("Hey friend does ?admin?true")
 # use xor to tamper
 #print(f"\n\nData to tamper: {new_data}\n\n")
 
+
 print(verify(new_data))
 
 barr = bytearray(new_data)
 print(barr)
 
 xor_block = ord(";") ^ ord("?")
+xor_block2 = ord("=") ^ ord("?")
 barr[21] = barr[21] ^ xor_block
-barr[27] = barr[27] ^ xor_block
+barr[27] = barr[27] ^ xor_block2
 
 
 print("MODIFIED,",barr)
