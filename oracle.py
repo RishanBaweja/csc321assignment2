@@ -30,19 +30,22 @@ def submit(input : str) -> bytes:
     return encrypted
 
 def verify(input: bytes) -> bool:
-    prev = bytes(iv)
-    decrypted = b''
-    for i in range(0, len(input), 16):
-        block = decrypt(input[i:i+16], prev)
-        print(f"DECRYPTED Block {i/16}: {block}\n")
-        decrypted += block
-        prev = input[i:i+16]
+    try:
+        prev = bytes(iv)
+        decrypted = b''
+        for i in range(0, len(input), 16):
+            block = decrypt(input[i:i+16], prev)
+            print(f"DECRYPTED Block {i/16}: {block}\n")
+            decrypted += block
+            prev = input[i:i+16]
 
-    #print(decrypted)
-    unpadded = CBC.pkcs7_strip(decrypted, 16)
-    plaintext = unpadded.decode("utf-8")
-    print(f"Plaintext: {plaintext}")
-    return ";admin=true;" in plaintext
+        #print(decrypted)
+        unpadded = CBC.pkcs7_strip(decrypted, 16)
+        plaintext = unpadded.decode("utf-8")
+        print(f"Plaintext: {plaintext}")
+    except:
+        print("whoops")
+        return ";admin=true;" in plaintext
 
 def encrypt(data, cross):
     # XOR data with random bits before going through the cipher
@@ -74,8 +77,14 @@ print(verify(new_data))
 
 barr = bytearray(new_data)
 print(barr)
-xor_block = bytes(ord(";") ^ ord("?"))
-barr[53] = bytes(map(xor, barr[53], xor_block))
+
+xor_block = ord(";") ^ ord("?")
+barr[21] = barr[21] ^ xor_block
+barr[27] = barr[27] ^ xor_block
+
+
+print("MODIFIED,",barr)
+
 print(verify(bytes(barr)))
 
 # b'userid%3D456%3B userdata%3DHey does :admin)true?%3Bsession-id%3D31337\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b'
